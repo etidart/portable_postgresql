@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.work/
+.pytest_cache/
+.venv/
+venv/
+build.log
+*.pgpayload
+*.tar.gz
+*.tar.xz
+pgdump-*.sql
+pgdump-*.dump
+pgdump-*.tar
