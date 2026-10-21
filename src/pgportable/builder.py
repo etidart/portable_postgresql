@@ -22,6 +22,11 @@ EXCLUDED_MODULES = (
     "doctest",
     "sqlite3",
     "lib2to3",
+    # readline pulls the build host's libreadline/libncurses into the frozen
+    # app; PyInstaller then advertises them to every child process through
+    # LD_LIBRARY_PATH, where they shadow the system copies and make shells and
+    # other tools die with "symbol lookup error".
+    "readline",
 )
 
 

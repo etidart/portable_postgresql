@@ -24,6 +24,7 @@ from pgportable.config import (
     exe_suffix,
     is_root,
     parse_major,
+    sanitize_child_env,
 )
 from pgportable.errors import InstanceError
 from pgportable.ui import Log
@@ -90,6 +91,7 @@ class Instance:
 
     def env(self) -> dict:
         env = os.environ.copy()
+        sanitize_child_env(env)
         if self.password:
             env["PGPASSWORD"] = self.password
         env["PGCLIENTENCODING"] = "UTF8"

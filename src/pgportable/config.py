@@ -78,6 +78,45 @@ def is_root() -> bool:
     return bool(geteuid) and geteuid() == 0
 
 
+#: Child-process variables that point the dynamic loader at extra libraries.
+_LOADER_PATH_VARS = ("LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH")
+_LOADER_PRELOAD_VARS = ("LD_PRELOAD", "DYLD_INSERT_LIBRARIES")
+
+
+def sanitize_child_env(env: dict) -> dict:
+    """Drop PyInstaller's injected library paths from ``env`` (in place).
+
+    The one-file bootloader puts its temporary extraction directory on
+    ``LD_LIBRARY_PATH`` (``DYLD_*`` on macOS). Child processes would then load
+    the frozen app's bundled shared libraries instead of the system ones, which
+    makes unrelated tools abort - a mismatched ``libreadline`` in particular
+    breaks ``/bin/sh`` with "symbol lookup error". The PostgreSQL binaries find
+    their own libraries through an ``$ORIGIN/../lib`` rpath, so removing the
+    entry is safe. Entries a user set deliberately are preserved.
+    """
+    meipass = getattr(sys, "_MEIPASS", None)
+    if not meipass:
+        return env
+    root = os.path.abspath(meipass)
+
+    def inside(value: str) -> bool:
+        absolute = os.path.abspath(value)
+        return absolute == root or absolute.startswith(root + os.sep)
+
+    for name in (*_LOADER_PATH_VARS, *_LOADER_PRELOAD_VARS):
+        value = env.get(name)
+        if not value:
+            continue
+        kept = [part for part in value.split(os.pathsep) if part and not inside(part)]
+        if kept:
+            env[name] = os.pathsep.join(kept)
+        else:
+            env.pop(name, None)
+
+    return env
+
+
+
 def parse_major(version: str) -> int:
     """``"18.6"`` -> ``18``; ``"9.6.24"`` -> ``9``."""
     head = version.split(".")[0]
