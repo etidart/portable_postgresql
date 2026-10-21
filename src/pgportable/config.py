@@ -116,7 +116,6 @@ def sanitize_child_env(env: dict) -> dict:
     return env
 
 
-
 def parse_major(version: str) -> int:
     """``"18.6"`` -> ``18``; ``"9.6.24"`` -> ``9``."""
     head = version.split(".")[0]
