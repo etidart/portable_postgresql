@@ -72,12 +72,14 @@ so builds stay current without code changes.
 | Platform | Source | Notes |
 | --- | --- | --- |
 | Windows x64 | `edb` (EnterpriseDB) | `postgresql-<ver>-1-windows-x64-binaries.zip`; full build including contrib |
-| Linux x64/arm64 | `zonky` | `io.zonky.test.postgres` on Maven Central; ships `initdb`, `psql`, `pg_dump`, `pg_restore` |
-| macOS | `zonky` | same artifacts, `darwin-*` classifiers |
+| Linux x64/arm64 | `theseus` | `theseus-rs/postgresql-binaries` GitHub releases; full build with `psql`, `pg_dump`, `pg_restore`, `pg_isready` |
+| macOS x64/arm64 | `theseus` | same project, `apple-darwin` targets |
 
 EnterpriseDB stopped publishing modern **Linux** binary archives (they end at
-PostgreSQL 9.3), which is why Linux uses zonky's trimmed builds. Use `--source edb`
-or `--source zonky` to force one.
+PostgreSQL 9.3), and zonky's `io.zonky.test.postgres` builds ship only the
+server (`initdb`, `pg_ctl`, `postgres`) with no client tools, so Linux and
+macOS use `theseus`, which ships the complete distribution (PostgreSQL 12+).
+Use `--source edb` or `--source theseus` to force one.
 
 ### Cross-compilation
 
@@ -145,7 +147,7 @@ A hard kill (`SIGKILL`, power loss) cannot run a dump or clean up; use
 ## CLI reference
 
 ```
-pgportable build   [--pg-version V] [--source auto|edb|zonky] [--out DIR] [--name N]
+pgportable build   [--pg-version V] [--source auto|edb|theseus] [--out DIR] [--name N]
                    [--compression gz|xz] [--work-dir DIR] [--keep-work] [--onedir]
                    [--platform P] [--log-level ...]
 
@@ -171,7 +173,8 @@ An unsigned one-file executable may trigger SmartScreen or antivirus scanning.
 
 **Linux.** `initdb` refuses to run as `root`; run as an unprivileged user. The cache
 directory must allow execution (not on a `noexec` mount) - use `--cache-dir` if needed.
-The zonky builds are trimmed, so exotic `contrib` extensions may be absent.
+The theseus builds bundle their shared libraries next to the binaries, so no system
+PostgreSQL packages are required.
 
 **`pg_dump`/`pg_restore` version.** The client tools bundled in the artifact must be at
 least as new as the server that produced a dump. Dump with `--pg-version` set to that
@@ -209,7 +212,7 @@ python -m pgportable run --pgsql-dir /path/to/pgsql --exec "SELECT version()"
 src/pgportable/
   cli.py        argparse front-end (build / run / cache / version)
   builder.py    fetch -> pack -> PyInstaller -> append payload
-  sources/      edb.py (Windows), zonky.py (Linux/macOS), base.py
+  sources/      edb.py (Windows), theseus.py (Linux/macOS/Windows), base.py
   bundle.py     download + archive extraction helpers
   payload.py    trailer pack/read, extraction, permission fixups
   cache.py      version-keyed extraction cache

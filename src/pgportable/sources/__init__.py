@@ -5,16 +5,16 @@ from __future__ import annotations
 from pgportable.errors import SourceError
 from pgportable.sources.base import Provider, version_key
 from pgportable.sources.edb import EdbProvider
-from pgportable.sources.zonky import ZonkyProvider
+from pgportable.sources.theseus import TheseusProvider
 from pgportable.ui import Log
 
-PROVIDERS: tuple[Provider, ...] = (EdbProvider(), ZonkyProvider())
+PROVIDERS: tuple[Provider, ...] = (EdbProvider(), TheseusProvider())
 
 __all__ = [
     "PROVIDERS",
     "EdbProvider",
     "Provider",
-    "ZonkyProvider",
+    "TheseusProvider",
     "select_provider",
     "version_key",
 ]

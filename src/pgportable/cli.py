@@ -97,7 +97,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--pg-version", default="latest", help="PostgreSQL version (default: latest available)"
     )
     build_cmd.add_argument(
-        "--source", choices=("auto", "edb", "zonky"), default="auto", help="binary provider"
+        "--source", choices=("auto", "edb", "theseus"), default="auto", help="binary provider"
     )
     build_cmd.add_argument("--out", default="dist", help="output directory")
     build_cmd.add_argument("--name", default=APP_NAME, help="artifact name")

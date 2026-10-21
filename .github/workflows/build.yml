@@ -46,6 +46,10 @@ jobs:
 
       - name: Build artifact
         run: python build.py --out dist --log-level info
+        env:
+          # Raises GitHub's anonymous API rate limit when resolving the
+          # PostgreSQL version from theseus-rs/postgresql-binaries releases.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Smoke test (linux)
         if: runner.os == 'Linux'

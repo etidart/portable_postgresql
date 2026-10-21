@@ -99,7 +99,8 @@ def materialize_pgsql(root: Path, workdir: Path) -> Path:
     """Return a directory literally named ``pgsql`` holding ``bin/``/``lib/``/``share/``.
 
     Different vendors ship the tree differently: EnterpriseDB zips already have a
-    top-level ``pgsql/`` folder, zonky tarballs unpack ``bin/`` at the root.
+    top-level ``pgsql/`` folder, while theseus tarballs unpack a
+    ``postgresql-<version>-<target>/`` directory containing ``bin/``.
     """
     root = Path(root)
     workdir = Path(workdir)
